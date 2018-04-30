@@ -1,0 +1,162 @@
+
+~~~~~~~~~~~~~~~~~~~~~~~~cekmynet.py~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+import os
+
+
+pattern = "3 received"
+nets = "192.168.6."
+ips = range(1,255)
+
+for x in ips :
+	ipx = nets + str(x)
+	cmd = "ping -q -c3 %s" %(ipx)
+	fp = os.popen(cmd)
+	outx = fp.read()
+	if outx.find(pattern) > -1:
+		status = "Up"
+
+	print("Host %s is %s" %(ipx,status))
+	status = "Down"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~ceknet.py~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+import os
+import ipaddress
+
+mynet = ipaddress.ip_network(u'192.168.6.0/24')
+pattern = "3 received"
+
+def xping(ipx):
+	status = "Down"
+	cmd = "ping -q -c3 %s" %(ipx)
+	fp = os.popen(cmd)
+	outx = fp.read()
+	if outx.find(pattern) > -1:
+		status = "Up"
+	print("proses child (%d), Host %s is %s" %(os.getpid(),ipx,status))
+	os._exit(0) #kembali ke parent
+
+for ipx in mynet:
+	if str(ipx) == '192.168.6.0' :
+		continue
+	newpid = os.fork()
+	# newpid = 0, we are in child process
+	# newpid = positive value, we are in parent process
+	# newpid = negatif value, eror occured
+
+	if newpid == 0:
+		xping(ipx)
+	else:
+		print("message from parent %d" %(os.getpid()))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~forking.py~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"forks child processes until you type 'q'"
+import os
+def child():
+	print('Hello from child',os.getpid())
+	os._exit(0) # else goes back to parent loop
+
+def parent():
+	while True:
+		newpid = os.fork()
+		if newpid == 0:
+			child()
+		else:
+			print('Hello from parent',os.getpid(),newpid)
+		if raw_input() == 'q':
+			break
+parent()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~threading.py~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+import threading
+import time
+class myThread (threading.Thread):
+	def __init__(self,threadName,counter):
+		threading.Thread.__init__(self)
+		self.name = threadName
+		self.counter = counter
+	def run(self):
+		while self.counter >= 1:
+			print("Starting %s - counter : %d "%(self.name,self.counter))
+			self.counter -= 1
+			time.sleep(1)
+		print("Exiting %s"%(self.name))
+
+# create  new threads
+thread1 = myThread("Thread-1", 5)
+thread2 = myThread("Thread-2", 4)
+
+# start new Threads
+thread1.start()
+thread2.start()
+print "Exiting Main Thread"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~threads.py~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"spawn threads until you type 'q'"
+import _thread
+def child(tid):
+	print('Hello from thread',tid)
+def parent():
+	i = 0
+	while True:
+		i +=1
+		_thread.start_new_thread(child, (i,))
+		if raw_input() == 'q':
+			break
+parent()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~min max daata~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def mymax(data):
+	#variable z menyimpan nilai terbesar saat ini
+	z=0
+	#melakukan iterasi variable data (array list)
+	
+	for x in data:
+		#membandingkan apakah x lebih besar dari nilai 			terbesar saat ini (z)
+		if x >= z :
+		#set x menjadi nilai terbesar saat ini
+			z = x
+		#kembalikan nilai z dan fungsi berakhir
+			return z
+		
+def mymin(data):
+	z=0
+	for x in data:
+		if x <=z:
+			z=x
+			return z
+
+a=[991, 2, 13, 4000, 2, 6, 1, 8, 9]
+
+print mymax(a)
+print mymin(a)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~urlib.py~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+import urllib2
+
+urls = ['192.168.1.22','www.detik.com','www.nurulfikri.com','www.nurulfikri.ac.id' 'www.compas.com','www.motogp.com']
+for uri in urls:
+	try:
+		con = urllib2.urlopen("http://%s"%uri, timeout=30)
+		print("Web %s is Run"%uri)
+		del(con)
+
+	except urllib2.URLError,e:
+		print("Oops Web %s is Down"%uri)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
