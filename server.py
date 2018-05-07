@@ -1,7 +1,7 @@
 from socket import socket, AF_INET, SOCK_STREAM
 import os
 s = socket(AF_INET, SOCK_STREAM)
-s.bind(('127.0.0.1 ', 9999))
+s.bind(('', 9999))
 s.listen(5) #max Quend Connections
 cmds = {'mdir':'mkdir','ddir':'rm -rf','rdir':'mv' }
 while True:
